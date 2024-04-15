@@ -1,14 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:pac_man/core/enum/direction_enum.dart';
-import 'package:pac_man/helpers/search_greedy_best.dart';
 import '../../helpers/search_a_star.dart';
 import 'box_model.dart';
 import 'box_pos_model.dart';
 import 'row_colums_model.dart';
 
-class Enemy{
-
+class Enemy {
   bool start = false;
   bool roaming = false;
   bool die = false;
@@ -85,7 +83,8 @@ class Enemy{
   bool completeArrive(Size size) {
     if (targetOffset == null) return false;
 
-    return (targetOffset! - position!.offset!).distance < (size.shortestSide * 0.25);
+    return (targetOffset! - position!.offset!).distance <
+        (size.shortestSide * 0.25);
   }
 
   void calculateNextTarget() {
@@ -98,10 +97,13 @@ class Enemy{
 
     targetOffset = targetOffsets.removeAt(0);
 
-    position!.setDirectionInt(targetOffset! - position!.offset!, canRotateRealTime: true);
+    position!.setDirectionInt(targetOffset! - position!.offset!,
+        canRotateRealTime: true);
   }
 
-  void computedNewPoint(Offset playerOffset, List<Box> boxes, {
+  void computedNewPoint(
+    Offset playerOffset,
+    List<Box> boxes, {
     required RowColumn boxSize,
     required List<List<dynamic>> barriers,
     required Size size,
@@ -111,7 +113,11 @@ class Enemy{
     targetOffset = null;
 
     if (playerPowerUp) {
-      List<Box> boxTargets = boxes.where((element) => (element.position!.offset! - playerOffset).distance > size.shortestSide * 2).toList();
+      List<Box> boxTargets = boxes
+          .where((element) =>
+              (element.position!.offset! - playerOffset).distance >
+              size.shortestSide * 2)
+          .toList();
 
       if (boxTargets.isNotEmpty) {
         boxTargets.shuffle();
@@ -119,10 +125,13 @@ class Enemy{
       }
     }
 
-    Box? playerBox = boxes.firstWhere((element) => element.checkoffsetIn(playerOffset));
-    Box? ghostBox = boxes.firstWhere((element) => element.checkoffsetIn(position!.offset!));
+    Box? playerBox =
+        boxes.firstWhere((element) => element.checkoffsetIn(playerOffset));
+    Box? ghostBox =
+        boxes.firstWhere((element) => element.checkoffsetIn(position!.offset!));
 
-    Offset ghostPos = Offset(ghostBox.position!.columnIndex.toDouble(), ghostBox.position!.rowIndex.toDouble());
+    Offset ghostPos = Offset(ghostBox.position!.columnIndex.toDouble(),
+        ghostBox.position!.rowIndex.toDouble());
     late Offset targetPos;
 
     const double maxDX = 23.0;
@@ -130,39 +139,64 @@ class Enemy{
     const double maxDY = 16.0;
     const double minDY = 1.0;
 
-    if(index == 0) { // Blinky
-      targetPos = Offset(playerBox.position!.columnIndex.toDouble(), playerBox.position!.rowIndex.toDouble());
-    } else if(index == 1) { // Clyde
-      double distance = (Offset(playerBox.position!.columnIndex.toDouble(), playerBox.position!.rowIndex.toDouble()) - ghostPos).distance;
+    if (index == 0) {
+      // Blinky
+      targetPos = Offset(playerBox.position!.columnIndex.toDouble(),
+          playerBox.position!.rowIndex.toDouble());
+    } else if (index == 1) {
+      // Clyde
+      double distance = (Offset(playerBox.position!.columnIndex.toDouble(),
+                  playerBox.position!.rowIndex.toDouble()) -
+              ghostPos)
+          .distance;
       if (distance > 5) {
-        targetPos = Offset(playerBox.position!.columnIndex.toDouble(), playerBox.position!.rowIndex.toDouble());
+        targetPos = Offset(playerBox.position!.columnIndex.toDouble(),
+            playerBox.position!.rowIndex.toDouble());
       } else {
         targetPos = const Offset(1, 1);
       }
-    } else if(index == 2) { // Pinky
+    } else if (index == 2) {
+      // Pinky
       double dx = playerBox.position!.columnIndex.toDouble();
       double dy = playerBox.position!.rowIndex.toDouble();
 
-      switch(playerBox.position!.direction){
-        case Direction.Top: dy -= 2; break;
-        case Direction.Bottom: dy += 2; break;
-        case Direction.Right: dx += 2; break;
-        case Direction.Left: dx -= 2; break;
+      switch (playerBox.position!.direction) {
+        case Direction.Top:
+          dy -= 2;
+          break;
+        case Direction.Bottom:
+          dy += 2;
+          break;
+        case Direction.Right:
+          dx += 2;
+          break;
+        case Direction.Left:
+          dx -= 2;
+          break;
       }
 
       dx = dx.clamp(minDX, maxDX);
       dy = dy.clamp(minDY, maxDY);
 
       targetPos = Offset(dx, dy);
-    } else { // Inky
+    } else {
+      // Inky
       double dx = playerBox.position!.columnIndex.toDouble();
       double dy = playerBox.position!.rowIndex.toDouble();
 
-      switch(playerBox.position!.direction){
-        case Direction.Top: dy -= 1; break;
-        case Direction.Bottom: dy += 1; break;
-        case Direction.Right: dx += 1; break;
-        case Direction.Left: dx -= 1; break;
+      switch (playerBox.position!.direction) {
+        case Direction.Top:
+          dy -= 1;
+          break;
+        case Direction.Bottom:
+          dy += 1;
+          break;
+        case Direction.Right:
+          dx += 1;
+          break;
+        case Direction.Left:
+          dx -= 1;
+          break;
       }
 
       dx = dx.clamp(minDX, maxDX);
@@ -180,7 +214,8 @@ class Enemy{
       //withDiagonal: false,
     ).findThePath();
 
-    targetOffsets = result.map((e) => e.scale(size.width, size.height)).toList();
+    targetOffsets =
+        result.map((e) => e.scale(size.width, size.height)).toList();
     targetOffsets.add(targetPos);
 
     if (!die) {
@@ -197,7 +232,9 @@ class Enemy{
       position!.setOffset(position!.getOffsetBasedRotation(size));
     }
   }
-  void generateRandom() => randomDelay = targetOffsets.length < 2 ? 0 : Random().nextInt(targetOffsets.length);
+
+  void generateRandom() => randomDelay =
+      targetOffsets.length < 2 ? 0 : Random().nextInt(targetOffsets.length);
 
   void setDie() => die = true;
 
@@ -205,13 +242,17 @@ class Enemy{
 
   getColor(int index) {
     if (playerPowerUp) {
-      return  const Color.fromARGB(255, 2, 70, 126);
+      return const Color.fromARGB(255, 2, 70, 126);
     } else {
       switch (index) {
-        case 0: return  Colors.red;
-        case 1: return  Colors.blue;
-        case 2: return  Colors.orange;
-        default: return  Colors.pink;
+        case 0:
+          return Colors.red;
+        case 1:
+          return Colors.blue;
+        case 2:
+          return Colors.orange;
+        default:
+          return Colors.pink;
       }
     }
   }

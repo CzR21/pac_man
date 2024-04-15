@@ -55,7 +55,11 @@ class GreedyBestFirstSearch {
     return path.reversed;
   }
 
-  List<List<Tile>> _createGrid(int rows, int columns, List<Offset> barriers,) {
+  List<List<Tile>> _createGrid(
+    int rows,
+    int columns,
+    List<Offset> barriers,
+  ) {
     List<List<Tile>> grid = List.empty(growable: true);
 
     List.generate(columns, (x) {
@@ -63,8 +67,15 @@ class GreedyBestFirstSearch {
       List.generate(rows, (y) {
         final offset = Offset(x.toDouble(), y.toDouble());
 
-        bool isBarrier = barriers.where((element) => element == offset).isNotEmpty;
-        rowList.add(Tile(offset, List.empty(growable: true), isBarrier: isBarrier,),);
+        bool isBarrier =
+            barriers.where((element) => element == offset).isNotEmpty;
+        rowList.add(
+          Tile(
+            offset,
+            List.empty(growable: true),
+            isBarrier: isBarrier,
+          ),
+        );
       });
       grid.add(rowList);
     });
@@ -73,8 +84,8 @@ class GreedyBestFirstSearch {
   }
 
   void _addNeighbors(List<List<Tile>> grid) {
-    grid.forEach((_) {
-      _.forEach((element) {
+    for (var _ in grid) {
+      for (var element in _) {
         int x = element.position.dx.toInt();
         int y = element.position.dy.toInt();
 
@@ -105,19 +116,22 @@ class GreedyBestFirstSearch {
             element.neighbors.add(t);
           }
         }
-      });
-    });
+      }
+    }
   }
 
   Tile? _getTileWinner(Tile current, Tile end) {
     if (current == end) return current;
     _waitList.remove(current);
 
-    current.neighbors.forEach((element) => _analiseDistance(element, end, parent: current));
+    for (var element in current.neighbors) {
+      _analiseDistance(element, end, parent: current);
+    }
 
     _doneList.add(current);
 
-    _waitList.addAll(current.neighbors.where((element) => !_doneList.contains(element)));
+    _waitList.addAll(
+        current.neighbors.where((element) => !_doneList.contains(element)));
 
     _waitList.sort((a, b) => _distance(a, end).compareTo(_distance(b, end)));
 
