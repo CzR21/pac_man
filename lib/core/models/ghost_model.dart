@@ -1,7 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:pac_man/core/enum/direction_enum.dart';
+import 'package:pac_man/globals/constants.dart';
 import '../../helpers/search_a_star.dart';
+import '../../helpers/search_greedy_best.dart';
 import 'box_model.dart';
 import 'box_pos_model.dart';
 import 'row_colums_model.dart';
@@ -207,14 +209,52 @@ class Enemy {
       targetPos = Offset(dx, dy);
     }
 
-    final result = AStar(
-      rows: boxSize.row,
-      columns: boxSize.column,
-      start: ghostPos, // posição do fantasma
-      end: targetPos, // posição que se quer ir (objetivo)
-      barriers: List<Offset>.from(barriers.expand((element) => element)),
-      //withDiagonal: false,
-    ).findThePath();
+    late List<Offset> result;
+
+    if (Constant.fase == 1) {
+      result = GreedyBestFirstSearch(
+        rows: boxSize.row,
+        columns: boxSize.column,
+        start: ghostPos,
+        end: targetPos,
+        barriers: List<Offset>.from(barriers.expand((element) => element)),
+      ).findThePath();
+    } else if (Constant.fase == 2) {
+      switch (index) {
+        case 0:
+        case 1:
+          result = AStar(
+            rows: boxSize.row,
+            columns: boxSize.column,
+            start: ghostPos,
+            end: targetPos,
+            barriers: List<Offset>.from(barriers.expand((element) => element)),
+            withDiagonal: false,
+          ).findThePath();
+          break;
+        case 2:
+        case 3:
+          result = GreedyBestFirstSearch(
+            rows: boxSize.row,
+            columns: boxSize.column,
+            start: ghostPos,
+            end: targetPos,
+            barriers: List<Offset>.from(barriers.expand((element) => element)),
+          ).findThePath();
+          break;
+        default:
+          throw "ERRO NO INDEX";
+      }
+    } else {
+      result = AStar(
+        rows: boxSize.row,
+        columns: boxSize.column,
+        start: ghostPos,
+        end: targetPos,
+        barriers: List<Offset>.from(barriers.expand((element) => element)),
+        withDiagonal: false,
+      ).findThePath();
+    }
 
     targetOffsets =
         result.map((e) => e.scale(size.width, size.height)).toList();

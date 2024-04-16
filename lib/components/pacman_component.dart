@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:ui';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pac_man/core/painters/ghost_painter.dart';
 import 'package:pac_man/core/painters/player_painter.dart';
@@ -60,6 +62,8 @@ class PacmanComponentState extends State<PacmanComponent>
   late AnimationController animationController;
   late Size sizeFull;
 
+  bool venceu = false;
+
   @override
   void initState() {
     super.initState();
@@ -89,6 +93,10 @@ class PacmanComponentState extends State<PacmanComponent>
           children: [
             backgroundWidget(),
             ...foregroundWidget(),
+            Visibility(
+              visible: playerNotifier.value.die || venceu,
+              child: venceuPerceu(),
+            )
           ],
         ),
       ),
@@ -151,6 +159,53 @@ class PacmanComponentState extends State<PacmanComponent>
     });
   }
 
+  venceuPerceu() {
+    return LayoutBuilder(builder: (context, constraint) {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+              child: Container(
+                color: Colors.black.withOpacity(0.3),
+              ),
+            ),
+          ),
+          Container(
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  venceu ? "WIN 👍" : "GAME OVER",
+                  style: const TextStyle(
+                    color: CupertinoColors.systemYellow,
+                    fontSize: 30,
+                  ),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Constant.fase = 1;
+                    venceu = false;
+                    resetGame();
+                  },
+                  child: const Icon(
+                    Icons.replay,
+                    color: CupertinoColors.systemYellow,
+                    size: 70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    });
+  }
+
   foregroundWidget() {
     return [
       ValueListenableBuilder(
@@ -197,10 +252,6 @@ class PacmanComponentState extends State<PacmanComponent>
                   ),
                   child: Container(
                     constraints: BoxConstraints.tight(sizePerBox),
-                    // child: Container(
-                    //   margin: const EdgeInsets.all(4.5),
-                    //   color: Colors.yellow,
-                    // ),
                   ),
                 ),
               ),
@@ -217,22 +268,19 @@ class PacmanComponentState extends State<PacmanComponent>
   }
 
   generateList() {
-    List<List<int>> routes = Constant.grids;
+    List<List<int>> routes = Constant.fase == 1
+        ? Constant.grids
+        : Constant.fase == 2
+            ? Constant.gridsFase2
+            : Constant.gridsFase3;
 
     boxSize = RowColumn(routes.length, routes[0].length);
-
-    // List<RowColumn> localRowCol = [
-    //   RowColumn(5, 14),
-    //   RowColumn(6, 13),
-    //   RowColumn(6, 14),
-    //   RowColumn(6, 15),
-    //   RowColumn(6, 16),
-    // ];
 
     barriers = [];
 
     setState(
-        () => sizePerBox = Size.square(boxSize.calculateMaxSize(sizeBoxOuter)));
+      () => sizePerBox = Size.square(boxSize.calculateMaxSize(sizeBoxOuter)),
+    );
 
     playerNotifier.value.setSize(sizePerBox);
 
@@ -349,6 +397,18 @@ class PacmanComponentState extends State<PacmanComponent>
 
           updateNotifier(playerNotify: true);
 
+          // Verifica se o Pac-Man comeu todas as frutas ou power-ups
+          bool allIconsEaten =
+              boxess.every((element) => !element.gotOrange && !element.powerUp);
+          if (allIconsEaten) {
+            if (Constant.fase < 3) {
+              Constant.fase++;
+              resetGame();
+            } else {
+              venceu = true;
+            }
+          }
+
           boxesNotifier.value
               .expand((element) => element)
               .where((element) => element.checkoffsetInRange(
@@ -388,7 +448,8 @@ class PacmanComponentState extends State<PacmanComponent>
                     sizePerBox, playerNotifier.value.position!);
 
             if (hitPlayer && !playerNotifier.value.die) {
-              playerNotifier.value.die = true;
+              setState(() => playerNotifier.value.die = true);
+              Constant.fase = 1;
               mapkey.value.setPause();
               updateNotifier(playerNotify: true);
 

@@ -8,34 +8,53 @@ class GhostPainter extends CustomPainter with ChangeNotifier {
 
   @override
   void paint(Canvas canvas, Size size) {
+
     Path path = Path();
     Path pathEyes = Path();
+    Path pathMouth = Path();
 
     pathEyes.addOval(Rect.fromCircle(
         center: getOffsetBasePercent(size, 0.35, 0.4),
-        radius: size.width * 0.15));
+        radius: size.width * 0.1));
 
     pathEyes.addOval(Rect.fromCircle(
         center: getOffsetBasePercent(size, 0.65, 0.4),
-        radius: size.width * 0.15));
+        radius: size.width * 0.1));
 
-    Color color = enemy.getColor(index);
+    Color color = Colors.green;
 
     if (!enemy.die) {
-      path.addPolygon([
-        getOffsetBasePercent(size, 0.2, 0.2),
-        getOffsetBasePercent(size, 0.35, 0.15),
-        getOffsetBasePercent(size, 0.5, 0.1),
-        getOffsetBasePercent(size, 0.65, 0.15),
-        getOffsetBasePercent(size, 0.8, 0.2),
-        getOffsetBasePercent(size, 0.8, 0.8),
-        getOffsetBasePercent(size, 0.7, 0.7),
-        getOffsetBasePercent(size, 0.6, 0.8),
-        getOffsetBasePercent(size, 0.5, 0.7),
-        getOffsetBasePercent(size, 0.4, 0.8),
-        getOffsetBasePercent(size, 0.3, 0.7),
-        getOffsetBasePercent(size, 0.2, 0.8),
-      ], true);
+      path.moveTo(getOffsetBasePercent(size, 0.2, 0.5).dx,
+          getOffsetBasePercent(size, 0.2, 0.5).dy);
+      path.lineTo(getOffsetBasePercent(size, 0.3, 0.3).dx,
+          getOffsetBasePercent(size, 0.3, 0.3).dy);
+      path.quadraticBezierTo(
+          getOffsetBasePercent(size, 0.5, 0.1).dx,
+          getOffsetBasePercent(size, 0.5, 0.1).dy,
+          getOffsetBasePercent(size, 0.7, 0.3).dx,
+          getOffsetBasePercent(size, 0.7, 0.3).dy);
+      path.lineTo(getOffsetBasePercent(size, 0.8, 0.5).dx,
+          getOffsetBasePercent(size, 0.8, 0.5).dy);
+      path.lineTo(getOffsetBasePercent(size, 0.7, 0.7).dx,
+          getOffsetBasePercent(size, 0.7, 0.7).dy);
+      path.lineTo(getOffsetBasePercent(size, 0.6, 0.9).dx,
+          getOffsetBasePercent(size, 0.6, 0.9).dy);
+      path.quadraticBezierTo(
+          getOffsetBasePercent(size, 0.5, 0.95).dx,
+          getOffsetBasePercent(size, 0.5, 0.95).dy,
+          getOffsetBasePercent(size, 0.4, 0.9).dx,
+          getOffsetBasePercent(size, 0.4, 0.9).dy);
+      path.lineTo(getOffsetBasePercent(size, 0.3, 0.7).dx,
+          getOffsetBasePercent(size, 0.3, 0.7).dy);
+      path.close();
+
+      pathMouth.moveTo(getOffsetBasePercent(size, 0.4, 0.9).dx,
+          getOffsetBasePercent(size, 0.4, 0.9).dy);
+      pathMouth.lineTo(getOffsetBasePercent(size, 0.6, 0.9).dx,
+          getOffsetBasePercent(size, 0.4, 0.9).dy);
+      pathMouth.lineTo(getOffsetBasePercent(size, 0.5, 0.8).dx,
+          getOffsetBasePercent(size, 0.5, 0.8).dy);
+      pathMouth.close();
 
       canvas.drawPath(
           path,
@@ -56,6 +75,13 @@ class GhostPainter extends CustomPainter with ChangeNotifier {
         makeEyeLid(canvas, enemy, size),
         Paint()
           ..color = const Color.fromARGB(255, 0, 0, 0)
+          ..style = PaintingStyle.fill
+          ..strokeWidth = 3);
+
+    canvas.drawPath(
+        pathMouth,
+        Paint()
+          ..color = Colors.pink
           ..style = PaintingStyle.fill
           ..strokeWidth = 3);
   }
