@@ -66,8 +66,8 @@ class GreedyBestFirstSearch {
   }
 
   void _addNeighbors(List<List<Tile>> grid) {
-    grid.forEach((column) {
-      column.forEach((tile) {
+    for (var column in grid) {
+      for (var tile in column) {
         final x = grid.indexOf(column);
         final y = column.indexOf(tile);
 
@@ -75,8 +75,8 @@ class GreedyBestFirstSearch {
         if (y < column.length - 1) _addNeighbor(tile, grid[x][y + 1]);
         if (x > 0) _addNeighbor(tile, grid[x - 1][y]);
         if (x < grid.length - 1) _addNeighbor(tile, grid[x + 1][y]);
-      });
-    });
+      }
+    }
   }
 
   void _addNeighbor(Tile tile, Tile neighbor) {
@@ -91,7 +91,7 @@ class GreedyBestFirstSearch {
 
       if (current == end) return current;
 
-      current.neighbors.forEach((neighbor) {
+      for (var neighbor in current.neighbors) {
         if (neighbor.parent == null) {
           neighbor.parent = current;
           neighbor.h = _distance(neighbor, end);
@@ -99,7 +99,7 @@ class GreedyBestFirstSearch {
         if (!_doneList.contains(neighbor)) {
           _waitList.add(neighbor);
         }
-      });
+      }
 
       _doneList.add(current);
     }

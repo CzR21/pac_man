@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pac_man/helpers/load_ui_image.dart';
 import '../models/player_model.dart';
 
 class PlayerPainter extends CustomPainter with ChangeNotifier{
@@ -13,7 +14,7 @@ class PlayerPainter extends CustomPainter with ChangeNotifier{
     List<double>? sources,
     List<Color>? colors,
     double? startRadian}
-  ) {
+  ) async {
     var total = 0.0;
 
     for (var d in sources!) {
@@ -25,6 +26,8 @@ class PlayerPainter extends CustomPainter with ChangeNotifier{
     for (var data in sources) {
       radians.add(data * 2 * pi / total);
     }
+
+    //canvas.drawImage(await loadUiImage("lib/assets/images/fish.gif"), Offset.zero, paint);
 
     for (int i = 0; i < radians.length; i++) {
       paint.color = colors![i % colors.length];

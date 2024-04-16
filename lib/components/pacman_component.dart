@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:pac_man/core/painters/ghost_painter.dart';
 import 'package:pac_man/core/painters/player_painter.dart';
 import 'package:pac_man/globals/constants.dart';
@@ -174,15 +173,27 @@ class PacmanComponentState extends State<PacmanComponent>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(venceu ? "WIN 👍" : "GAME OVER", style: const TextStyle(color: CupertinoColors.systemYellow, fontSize: 90),),
-                const SizedBox(height: 10,),
+                Text(
+                  venceu ? "WIN 👍" : "GAME OVER",
+                  style: const TextStyle(
+                    color: CupertinoColors.systemYellow,
+                    fontSize: 30,
+                  ),
+                ),
+                const SizedBox(
+                  height: 24,
+                ),
                 GestureDetector(
                   onTap: () {
                     Constant.fase = 1;
                     venceu = false;
                     resetGame();
                   },
-                  child: const Icon(Icons.replay, color: CupertinoColors.systemYellow, size: 100,),
+                  child: const Icon(
+                    Icons.replay,
+                    color: CupertinoColors.systemYellow,
+                    size: 70,
+                  ),
                 ),
               ],
             ),
@@ -254,13 +265,19 @@ class PacmanComponentState extends State<PacmanComponent>
   }
 
   generateList() {
-    List<List<int>> routes = Constant.fase == 1 ? Constant.grids : Constant.fase == 2 ? Constant.gridsFase2 : Constant.gridsFase3 ;
+    List<List<int>> routes = Constant.fase == 1
+        ? Constant.grids
+        : Constant.fase == 2
+            ? Constant.gridsFase2
+            : Constant.gridsFase3;
 
     boxSize = RowColumn(routes.length, routes[0].length);
 
     barriers = [];
 
-    setState(() => sizePerBox = Size.square(boxSize.calculateMaxSize(sizeBoxOuter)));
+    setState(
+      () => sizePerBox = Size.square(boxSize.calculateMaxSize(sizeBoxOuter)),
+    );
 
     playerNotifier.value.setSize(sizePerBox);
 
@@ -378,12 +395,13 @@ class PacmanComponentState extends State<PacmanComponent>
           updateNotifier(playerNotify: true);
 
           // Verifica se o Pac-Man comeu todas as frutas ou power-ups
-          bool allIconsEaten = boxess.every((element) => !element.gotOrange && !element.powerUp);
+          bool allIconsEaten =
+              boxess.every((element) => !element.gotOrange && !element.powerUp);
           if (allIconsEaten) {
-            if(Constant.fase < 3) {
+            if (Constant.fase < 3) {
               Constant.fase++;
               resetGame();
-            }else{
+            } else {
               venceu = true;
             }
           }
@@ -437,7 +455,8 @@ class PacmanComponentState extends State<PacmanComponent>
               }
               updateNotifier(enemyNotify: true);
 
-              setupAnimationPlayer(durationPlaySecond: 500, end: 1, start: 0, reverse: false);
+              setupAnimationPlayer(
+                  durationPlaySecond: 500, end: 1, start: 0, reverse: false);
               return e;
             }
 
