@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:pac_man/helpers/load_ui_image.dart';
 import '../models/player_model.dart';
 
 class PlayerPainter extends CustomPainter with ChangeNotifier{
