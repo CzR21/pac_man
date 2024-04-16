@@ -6,8 +6,8 @@ class GreedyBestFirstSearch {
   final Offset start;
   final Offset end;
   final List<Offset> barriers;
-  final List<Tile> _doneList = List.empty(growable: true);
-  final List<Tile> _waitList = List.empty(growable: true);
+  final List<Tile> _doneList = [];
+  final List<Tile> _waitList = [];
 
   late List<List<Tile>> grid;
 
@@ -21,12 +21,12 @@ class GreedyBestFirstSearch {
     grid = _createGrid(rows, columns, barriers);
   }
 
-  Iterable<Offset> findThePath({ValueChanged<List<Offset>>? doneList}) {
+  List<Offset> findThePath({ValueChanged<List<Offset>>? doneList}) {
     _doneList.clear();
     _waitList.clear();
 
     if (barriers.contains(end)) {
-      return List.empty(growable: true);
+      return [];
     }
 
     _addNeighbors(grid);
@@ -34,10 +34,7 @@ class GreedyBestFirstSearch {
     Tile startTile = grid[start.dx.toInt()][start.dy.toInt()];
     Tile endTile = grid[end.dx.toInt()][end.dy.toInt()];
 
-    Tile? winner = _getTileWinner(
-      startTile,
-      endTile,
-    );
+    Tile? winner = _getTileWinner(startTile, endTile);
 
     List<Offset> path = [end];
 
@@ -52,112 +49,67 @@ class GreedyBestFirstSearch {
     path.add(start);
     doneList?.call(_doneList.map((e) => e.position).toList());
 
-    return path.reversed;
+    return path.reversed.toList();
   }
 
-  List<List<Tile>> _createGrid(
-    int rows,
-    int columns,
-    List<Offset> barriers,
-  ) {
-    List<List<Tile>> grid = List.empty(growable: true);
-
-    List.generate(columns, (x) {
-      List<Tile> rowList = List.empty(growable: true);
-      List.generate(rows, (y) {
+  List<List<Tile>> _createGrid(int rows, int columns, List<Offset> barriers) {
+    return List.generate(columns, (x) {
+      return List.generate(rows, (y) {
         final offset = Offset(x.toDouble(), y.toDouble());
-
-        bool isBarrier =
-            barriers.where((element) => element == offset).isNotEmpty;
-        rowList.add(
-          Tile(
-            offset,
-            List.empty(growable: true),
-            isBarrier: isBarrier,
-          ),
+        return Tile(
+          offset,
+          [],
+          isBarrier: barriers.contains(offset),
         );
       });
-      grid.add(rowList);
     });
-
-    return grid;
   }
 
   void _addNeighbors(List<List<Tile>> grid) {
-    for (var _ in grid) {
-      for (var element in _) {
-        int x = element.position.dx.toInt();
-        int y = element.position.dy.toInt();
+    grid.forEach((column) {
+      column.forEach((tile) {
+        final x = grid.indexOf(column);
+        final y = column.indexOf(tile);
 
-        if (y > 0) {
-          final t = grid[x][y - 1];
-          if (!t.isBarrier) {
-            element.neighbors.add(t);
-          }
-        }
-
-        if (y < (grid.first.length - 1)) {
-          final t = grid[x][y + 1];
-          if (!t.isBarrier) {
-            element.neighbors.add(t);
-          }
-        }
-
-        if (x > 0) {
-          final t = grid[x - 1][y];
-          if (!t.isBarrier) {
-            element.neighbors.add(t);
-          }
-        }
-
-        if (x < (grid.length - 1)) {
-          final t = grid[x + 1][y];
-          if (!t.isBarrier) {
-            element.neighbors.add(t);
-          }
-        }
-      }
-    }
+        if (y > 0) _addNeighbor(tile, grid[x][y - 1]);
+        if (y < column.length - 1) _addNeighbor(tile, grid[x][y + 1]);
+        if (x > 0) _addNeighbor(tile, grid[x - 1][y]);
+        if (x < grid.length - 1) _addNeighbor(tile, grid[x + 1][y]);
+      });
+    });
   }
 
-  Tile? _getTileWinner(Tile current, Tile end) {
-    if (current == end) return current;
-    _waitList.remove(current);
+  void _addNeighbor(Tile tile, Tile neighbor) {
+    if (!neighbor.isBarrier) tile.neighbors.add(neighbor);
+  }
 
-    for (var element in current.neighbors) {
-      _analiseDistance(element, end, parent: current);
-    }
+  Tile? _getTileWinner(Tile start, Tile end) {
+    while (_waitList.isNotEmpty) {
+      _waitList.sort((a, b) => a.h.compareTo(b.h));
 
-    _doneList.add(current);
+      final current = _waitList.removeAt(0);
 
-    _waitList.addAll(
-        current.neighbors.where((element) => !_doneList.contains(element)));
+      if (current == end) return current;
 
-    _waitList.sort((a, b) => _distance(a, end).compareTo(_distance(b, end)));
-
-    for (final element in _waitList.toList()) {
-      if (!_doneList.contains(element)) {
-        final result = _getTileWinner(element, end);
-        if (result != null) {
-          return result;
+      current.neighbors.forEach((neighbor) {
+        if (neighbor.parent == null) {
+          neighbor.parent = current;
+          neighbor.h = _distance(neighbor, end);
         }
-      }
+        if (!_doneList.contains(neighbor)) {
+          _waitList.add(neighbor);
+        }
+      });
+
+      _doneList.add(current);
     }
 
     return null;
   }
 
-  void _analiseDistance(Tile current, Tile end, {Tile? parent}) {
-    if (current.parent == null) {
-      current.parent = parent;
-      current.h = _distance(current, end);
-    }
-  }
-
   int _distance(Tile tile1, Tile tile2) {
-    int distX = (tile1.position.dx.toInt() - tile2.position.dx.toInt()).abs();
-    int distY = (tile1.position.dy.toInt() - tile2.position.dy.toInt()).abs();
-    return distX + distY;
+    return (tile1.position.dx.toInt() - tile2.position.dx.toInt()).abs() +
+        (tile1.position.dy.toInt() - tile2.position.dy.toInt()).abs();
   }
 }
 
