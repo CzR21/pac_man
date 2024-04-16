@@ -132,13 +132,14 @@ class Enemy {
 
     Offset ghostPos = Offset(ghostBox.position!.columnIndex.toDouble(),
         ghostBox.position!.rowIndex.toDouble());
-    late Offset targetPos;
+    late Offset targetPos; // posição que o fantasma quer buscar
 
     const double maxDX = 23.0;
     const double minDX = 1.0;
     const double maxDY = 16.0;
     const double minDY = 1.0;
 
+    // AQUI ENCONTRA A POSIÇÃO DEPENDENDO DA REGRA DO FANTASMINHA
     if (index == 0) {
       // Blinky
       targetPos = Offset(playerBox.position!.columnIndex.toDouble(),
@@ -161,6 +162,7 @@ class Enemy {
       double dy = playerBox.position!.rowIndex.toDouble();
 
       switch (playerBox.position!.direction) {
+        // DIREÇÃO PRA ONDE TA INDO
         case Direction.Top:
           dy -= 2;
           break;
@@ -208,8 +210,8 @@ class Enemy {
     final result = AStar(
       rows: boxSize.row,
       columns: boxSize.column,
-      start: ghostPos,
-      end: targetPos,
+      start: ghostPos, // posição do fantasma
+      end: targetPos, // posição que se quer ir (objetivo)
       barriers: List<Offset>.from(barriers.expand((element) => element)),
       //withDiagonal: false,
     ).findThePath();

@@ -29,6 +29,7 @@ class GreedyBestFirstSearch {
       return List.empty(growable: true);
     }
 
+    //Adiciona vizinhos
     _addNeighbors(grid);
 
     Tile startTile = grid[start.dx.toInt()][start.dy.toInt()];
@@ -86,8 +87,12 @@ class GreedyBestFirstSearch {
   void _addNeighbors(List<List<Tile>> grid) {
     for (var _ in grid) {
       for (var element in _) {
+        //Posição do elemento
         int x = element.position.dx.toInt();
         int y = element.position.dy.toInt();
+
+        //Verifica se não está nas bordas ou se não é barreira
+        //Adiciona possível posição válida
 
         if (y > 0) {
           final t = grid[x][y - 1];

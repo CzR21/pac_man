@@ -32,6 +32,8 @@ class PacmanComponentState extends State<PacmanComponent>
   ValueNotifier<Player> playerNotifier = ValueNotifier<Player>(Player());
   ValueNotifier<List<List<Box>>> boxesNotifier =
       ValueNotifier<List<List<Box>>>([]);
+
+  //Lista com os fantasminhas inimigos
   ValueNotifier<List<Enemy>> enemiesNotifier = ValueNotifier<List<Enemy>>([
     Enemy(position: BoxPos(6, 13)),
     Enemy(position: BoxPos(6, 14)),
@@ -93,6 +95,7 @@ class PacmanComponentState extends State<PacmanComponent>
     );
   }
 
+  // Animação do player
   setupAnimationPlayer(
       {int durationPlaySecond = 200,
       double start = 0,
@@ -157,8 +160,8 @@ class PacmanComponentState extends State<PacmanComponent>
             ...enemies.asMap().entries.map(
                   (e) => AnimatedPositioned(
                     duration: Duration(
-                        milliseconds:
-                            e.value.start || e.value.roaming ? 300 : 1),
+                      milliseconds: e.value.start || e.value.roaming ? 300 : 1,
+                    ),
                     left: e.value.position?.offset?.dx,
                     top: e.value.position?.offset?.dy,
                     child: CustomPaint(
@@ -445,6 +448,7 @@ class PacmanComponentState extends State<PacmanComponent>
     }); // Timer.periodic
   }
 
+  //Inicialização do jogo
   startGame() {
     playerNotifier.value.setPlay();
 

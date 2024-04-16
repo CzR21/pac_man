@@ -36,6 +36,7 @@ class MyHomePageState extends State<MyHomePage> {
   GlobalKey<PacmanComponentState> gameKey = GlobalKey<PacmanComponentState>();
   ValueNotifier<int> scoreNotifier = ValueNotifier<int>(0);
 
+  //Atualização da pontuação do jogo
   void udpateScore(int score) {
     scoreNotifier.value = scoreNotifier.value + score;
     scoreNotifier.notifyListeners();
