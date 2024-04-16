@@ -59,5 +59,5 @@ class Constant {
     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   ];
 
-  static int fase = 3;
+  static int fase = 1;
 }
