@@ -211,6 +211,7 @@ class Enemy {
 
     late List<Offset> result;
 
+    //Caso seja a fase 1, o algoritmo utilizado será a busca gulosa
     if (Constant.fase == 1) {
       result = GreedyBestFirstSearch(
         rows: boxSize.row,
@@ -219,7 +220,10 @@ class Enemy {
         end: targetPos,
         barriers: List<Offset>.from(barriers.expand((element) => element)),
       ).findThePath();
-    } else if (Constant.fase == 2) {
+    }
+
+    //Caso seja a fase dois, o algoritmo utilizado será o A-ESTRELA
+    else if (Constant.fase == 2) {
       switch (index) {
         case 0:
         case 1:
